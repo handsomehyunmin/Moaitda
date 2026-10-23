@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>모아 잇다</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- 로그인 -->
+  <section id="loginScreen" class="screen auth-screen">
+    <div class="auth-card">
+      <div class="brand-mark">모</div>
+      <h1>모아 잇다</h1>
+      <p class="muted">함께 글을 쓰고 소통하는 공간</p>
+      <form id="loginForm" class="form">
+        <label>이메일</label>
+        <input id="loginEmail" type="email" placeholder="email@example.com" required>
+        <label>비밀번호</label>
+        <input id="loginPassword" type="password" placeholder="비밀번호" required>
+        <button class="primary-btn" type="submit">로그인</button>
+      </form>
+      <p class="switch-text">계정이 없나요? <button class="text-btn" data-show="signupScreen">회원가입</button></p>
+    </div>
+  </section>
+
+  <!-- 회원가입 -->
+  <section id="signupScreen" class="screen auth-screen hidden">
+    <div class="auth-card">
+      <div class="brand-mark">모</div>
+      <h1>회원가입</h1>
+      <p class="muted">모아 잇다를 시작해보세요.</p>
+      <form id="signupForm" class="form">
+        <label>이메일</label>
+        <input id="signupEmail" type="email" placeholder="email@example.com" required>
+        <label>비밀번호</label>
+        <input id="signupPassword" type="password" minlength="4" placeholder="4자 이상" required>
+        <button class="primary-btn" type="submit">다음</button>
+      </form>
+      <p class="switch-text">이미 계정이 있나요? <button class="text-btn" data-show="loginScreen">로그인</button></p>
+    </div>
+  </section>
+
+  <!-- 닉네임 -->
+  <section id="nicknameScreen" class="screen auth-screen hidden">
+    <div class="auth-card">
+      <div class="brand-mark">모</div>
+      <h1>닉네임 설정</h1>
+      <p class="muted">게시글에 표시될 이름을 정해주세요.</p>
+      <form id="nicknameForm" class="form">
+        <label>닉네임</label>
+        <input id="nicknameInput" type="text" minlength="2" maxlength="10" placeholder="예: 민수" required>
+        <span class="help-text">2~10글자로 입력해주세요.</span>
+        <button class="primary-btn" type="submit">시작하기</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- 메인 -->
+  <section id="homeScreen" class="screen hidden">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="mobile-menu" id="mobileMenuBtn">☰</button>
+        <div class="brand-small">모아 잇다</div>
+      </div>
+      <div class="top-actions">
+        <div class="search-wrap">
+          <span>⌕</span>
+          <input id="searchInput" type="search" placeholder="게시글 검색">
+        </div>
+        <button class="profile-btn" id="profileBtn"><span id="profileAvatar">M</span><span id="profileName">사용자</span></button>
+      </div>
+    </header>
+
+    <div class="app-layout">
+      <aside class="sidebar" id="sidebar">
+        <div class="side-section">
+          <button class="side-link active" data-filter="all">⌂ <span>홈</span></button>
+          <button class="side-link" data-filter="mine">▤ <span>내 게시물</span></button>
+          <button class="side-link" data-filter="liked">♡ <span>좋아요</span></button>
+        </div>
+      </aside>
+
+      <main class="main-area">
+        <div class="page-heading">
+          <div>
+            <p class="eyebrow">COMMUNITY</p>
+            <h2 id="pageTitle">홈</h2>
+            <p class="muted" id="pageDescription">모든 사용자의 게시물을 확인할 수 있어요.</p>
+          </div>
+          <button class="primary-btn compact" id="headingNewPost">＋ 새 게시글</button>
+        </div>
+
+        <div class="page-toolbar">
+          <div id="activeFilter" class="filter-label">전체 게시글</div>
+          <div class="toolbar-right">
+            <button class="ghost-btn" id="clearSearchBtn">검색 초기화</button>
+            <span id="postCount">0개</span>
+          </div>
+        </div>
+
+        <div id="postFeed" class="post-feed"></div>
+        <div id="emptyState" class="empty-state hidden">
+          <strong>게시물이 없습니다.</strong>
+          <span>첫 게시물을 작성해보세요.</span>
+        </div>
+      </main>
+    </div>
+  </section>
+
+  <!-- 작성 모달 -->
+  <div class="modal hidden" id="writeModal">
+    <div class="modal-backdrop" data-close="writeModal"></div>
+    <div class="modal-card">
+      <div class="modal-head">
+        <div>
+          <p class="eyebrow">NEW POST</p>
+          <h3 id="writeModalTitle">새 게시글 작성</h3>
+        </div>
+        <button class="close-btn" data-close="writeModal">×</button>
+      </div>
+      <form id="postForm" class="modal-body">
+        <input type="hidden" id="editingPostId">
+        <label>제목</label>
+        <input id="postTitle" type="text" maxlength="80" placeholder="게시글 제목을 입력하세요" required>
+
+        <label>내용</label>
+        <textarea id="postContent" rows="7" maxlength="1000" placeholder="내용을 입력하세요..." required></textarea>
+
+        <label>태그</label>
+        <input id="postTags" type="text" placeholder="예: 아이디어, 게임">
+
+        <label>이미지</label>
+        <input id="postImage" type="file" accept="image/jpeg,image/png,image/gif,image/webp">
+        <span class="help-text">최대 20MB / 비율을 유지하여 자동 축소합니다. GIF는 정지 사진으로 저장됩니다.</span>
+        <div id="imagePreview" class="image-preview hidden"></div>
+
+        <div class="modal-foot">
+          <button type="button" class="ghost-btn" data-close="writeModal">취소</button>
+          <button class="primary-btn" type="submit" id="savePostBtn">게시하기</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 상세 모달 -->
+  <div class="modal hidden" id="detailModal">
+    <div class="modal-backdrop" data-close="detailModal"></div>
+    <div class="modal-card detail-card">
+      <div class="modal-head">
+        <div>
+          <p class="eyebrow">POST DETAIL</p>
+          <h3 id="detailTitle">게시글</h3>
+        </div>
+        <button class="close-btn" data-close="detailModal">×</button>
+      </div>
+      <div class="detail-body">
+        <div class="post-meta">
+          <span id="detailAuthor">👤 사용자</span>
+          <span id="detailDate">📅 날짜</span>
+        </div>
+        <div id="detailContent" class="detail-content"></div>
+        <div id="detailImage" class="detail-image hidden"></div>
+        <div id="detailTags" class="tag-list"></div>
+
+        <div class="detail-actions">
+          <button class="ghost-btn" id="likeDetailBtn">♡ <span id="likeCount">0</span></button>
+          <button class="ghost-btn" id="editPostBtn">수정</button>
+          <button class="danger-btn" id="deletePostBtn">삭제</button>
+        </div>
+
+        <div class="comments">
+          <h4>댓글 <span id="commentCount">0</span></h4>
+          <div id="commentsList"></div>
+          <form id="commentForm" class="comment-form">
+            <input id="commentInput" type="text" maxlength="300" placeholder="댓글을 입력하세요..." required>
+            <button class="primary-btn" type="submit">작성</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 프로필 모달 -->
+  <div class="modal hidden" id="profileModal">
+    <div class="modal-backdrop" data-close="profileModal"></div>
+    <div class="modal-card small-modal">
+      <div class="modal-head">
+        <h3>내 프로필</h3>
+        <button class="close-btn" data-close="profileModal">×</button>
+      </div>
+      <div class="profile-panel">
+        <div class="big-avatar" id="bigAvatar">M</div>
+        <h3 id="profileModalName">사용자</h3>
+        <p class="muted" id="profileModalEmail">email@example.com</p>
+        <form id="profileImageForm" class="profile-image-form">
+          <label for="profileImageInput" class="ghost-btn profile-image-label">사진 선택</label>
+          <input id="profileImageInput" type="file" accept="image/jpeg,image/png,image/gif,image/webp" class="profile-file-input">
+          <p class="help-text">JPG, PNG, GIF, WebP / 최대 20MB / 자동 축소 (GIF는 정지 사진으로 저장)</p>
+          <div class="profile-image-actions">
+            <button type="button" class="ghost-btn" id="removeProfileImageBtn">사진 제거</button>
+            <button type="submit" class="primary-btn" id="saveProfileImageBtn" disabled>사진 저장</button>
+          </div>
+          <p id="profileImageStatus" class="help-text" role="status" aria-live="polite"></p>
+        </form>
+        <button class="primary-btn" id="logoutBtn">로그아웃</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
