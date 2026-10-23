@@ -1,0 +1,64 @@
+from contextlib import closing
+
+from database import DB_PATH, get_connection
+from repositories.common import now
+
+
+def initialize_database():
+    with closing(get_connection()) as conn:
+        conn.execute('PRAGMA journal_mode = WAL')
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS users (
+                            id INTEGER PRIMARY KEY AUTOINCREMENT,
+                            username TEXT NOT NULL UNIQUE,
+                            password TEXT NOT NULL,
+                            nickname TEXT NOT NULL
+                        )
+        """)
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS posts (
+                            id INTEGER PRIMARY KEY AUTOINCREMENT,
+                            user_id INTEGER NOT NULL
+                                REFERENCES users(id),
+                            title TEXT NOT NULL,
+                            content TEXT NOT NULL
+                        )
+        """)
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS comments (
+                            id INTEGER PRIMARY KEY AUTOINCREMENT,
+                            post_id INTEGER NOT NULL
+                                REFERENCES posts(id)
+                                ON DELETE CASCADE,
+                            user_id INTEGER NOT NULL
+                                REFERENCES users(id),
+                            content TEXT NOT NULL
+                        )
+        """)
+        fields = {'users': {'profile_image': "TEXT NOT NULL DEFAULT ''"}, 'posts': {'public_id': 'TEXT', 'tags': "TEXT NOT NULL DEFAULT '[]'", 'image': "TEXT NOT NULL DEFAULT ''", 'created_at': 'TEXT', 'updated_at': 'TEXT', 'likes': "TEXT NOT NULL DEFAULT '[]'"}, 'comments': {'created_at': 'TEXT'}}
+        for table, columns in fields.items():
+            existing = {row[1] for row in conn.execute(f'PRAGMA table_info({table})')}
+            for name, definition in columns.items():
+                if name not in existing:
+                    conn.execute(f'\n                        ALTER TABLE {table}\n                        ADD COLUMN {name} {definition}\n                        ')
+        conn.execute("""
+            CREATE UNIQUE INDEX
+                        IF NOT EXISTS posts_public_id
+                        ON posts(public_id)
+        """)
+        conn.execute("""
+            UPDATE posts
+                        SET created_at = ?
+                        WHERE created_at IS NULL
+        """, (now(),))
+        conn.execute("""
+            UPDATE comments
+                        SET created_at = ?
+                        WHERE created_at IS NULL
+        """, (now(),))
+        conn.commit()
+
+
+if __name__ == "__main__":
+    initialize_database()
+    print(f"Database initialized: {DB_PATH}")
