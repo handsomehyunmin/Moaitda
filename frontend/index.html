@@ -247,6 +247,31 @@
   </div>
 
   <div id="toast" class="toast hidden"></div>
+  <script>
+    document.addEventListener("click", (event) => {
+      const addFriendButton = event.target.closest("#openAddFriendBtn, #friendsAddBtn");
+      if (addFriendButton) {
+        document.querySelector("#addFriendModal")?.classList.remove("hidden");
+        return;
+      }
+
+      const closeButton = event.target.closest('[data-close="addFriendModal"]');
+      if (closeButton) {
+        document.querySelector("#addFriendModal")?.classList.add("hidden");
+        return;
+      }
+
+      if (event.target.closest("#showFriendsBtn")) {
+        ["#pageHeading", ".page-toolbar", "#postFeed", "#emptyState"].forEach((selector) => {
+          document.querySelector(selector)?.classList.add("hidden");
+        });
+        document.querySelector("#friendsPanel")?.classList.remove("hidden");
+        document.querySelectorAll(".side-link").forEach((link) => link.classList.remove("active"));
+        document.querySelector("#showFriendsBtn")?.classList.add("active");
+        document.dispatchEvent(new Event("friends:open"));
+      }
+    });
+  </script>
   <script type="module" src="js/app.js"></script>
 </body>
 </html>
