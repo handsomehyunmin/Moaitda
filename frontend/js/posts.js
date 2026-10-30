@@ -480,6 +480,12 @@ async function handleDelete() {
 }
 
 export function initPosts() {
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible" && state.currentUser) {
+      loadPosts();
+    }
+  });
+
   $("#headingNewPost")?.addEventListener("click", () => {
     openWrite();
   });
