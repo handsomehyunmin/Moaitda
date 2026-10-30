@@ -26,6 +26,12 @@ def send_request(sender_username, recipient_email):
         if sender_id == recipient_id:
             raise ValueError("자기 자신에게 친구 요청을 보낼 수 없습니다.")
 
+        if conn.execute(
+            "SELECT 1 FROM friends WHERE user_id = ? AND friend_id = ?",
+            (min(sender_id, recipient_id), max(sender_id, recipient_id)),
+        ).fetchone():
+            raise ValueError("이미 친구인 사용자입니다.")
+
         existing = conn.execute(
             "SELECT status FROM friend_requests WHERE sender_id = ? AND receiver_id = ?",
             (sender_id, recipient_id),
@@ -53,9 +59,9 @@ def list_friends(username):
         user_id = _user_id(conn, username)
         return [dict(row) for row in conn.execute("""
             SELECT u.username AS email, u.nickname
-            FROM friend_requests f
-            JOIN users u ON u.id = CASE WHEN f.sender_id = ? THEN f.receiver_id ELSE f.sender_id END
-            WHERE (f.sender_id = ? OR f.receiver_id = ?) AND f.status = 'accepted'
+            FROM friends f
+            JOIN users u ON u.id = CASE WHEN f.user_id = ? THEN f.friend_id ELSE f.user_id END
+            WHERE f.user_id = ? OR f.friend_id = ?
             ORDER BY u.nickname COLLATE NOCASE
         """, (user_id, user_id, user_id)).fetchall()]
 
@@ -74,6 +80,8 @@ def list_incoming_requests(username):
 
 
 def respond_to_request(username, request_id, status):
+    if status not in ("accepted", "rejected"):
+        raise ValueError("올바르지 않은 친구 요청 상태입니다.")
     with closing(get_connection()) as conn, conn:
         user_id = _user_id(conn, username)
         result = conn.execute(
@@ -82,4 +90,13 @@ def respond_to_request(username, request_id, status):
         )
         if result.rowcount == 0:
             raise ValueError("대기 중인 친구 요청을 찾을 수 없습니다.")
+        if status == "accepted":
+            sender_id, receiver_id = conn.execute(
+                "SELECT sender_id, receiver_id FROM friend_requests WHERE id = ?",
+                (request_id,),
+            ).fetchone()
+            conn.execute(
+                "INSERT OR IGNORE INTO friends (user_id, friend_id, created_at) VALUES (?, ?, ?)",
+                (min(sender_id, receiver_id), max(sender_id, receiver_id), now()),
+            )
     return {"message": "친구 요청을 수락했습니다." if status == "accepted" else "친구 요청을 거절했습니다."}
