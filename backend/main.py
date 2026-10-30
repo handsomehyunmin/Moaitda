@@ -160,13 +160,21 @@ def list_friends(authorization: str = Header(default="")):
     return friends.list_friends(user[0])
 
 
+@app.get("/friends/search")
+def search_friends(q: str = "", authorization: str = Header(default="")):
+    user = authenticated_user(authorization)
+    return friends.search_users(user[0], q[:30])
+
+
 @app.post("/friends", status_code=201)
 def send_friend_request(data: dict, authorization: str = Header(default="")):
     user = authenticated_user(authorization)
-    email = str(data.get("email", "")).strip().lower()
-    if not email:
-        raise HTTPException(status_code=422, detail="친구 이메일을 입력해주세요.")
     try:
+        if data.get("user_id") is not None:
+            return friends.send_request_to_id(user[0], int(data["user_id"]))
+        email = str(data.get("email", "")).strip().lower()
+        if not email:
+            raise HTTPException(status_code=422, detail="친구를 선택해주세요.")
         return friends.send_request(user[0], email)
     except ValueError as error:
         raise HTTPException(status_code=400, detail=str(error))

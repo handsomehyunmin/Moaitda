@@ -212,16 +212,16 @@
         <div><p class="eyebrow">STAY CONNECTED</p><h3 id="addFriendTitle">친구 추가</h3></div>
         <button class="close-btn" type="button" data-close="addFriendModal" aria-label="닫기">×</button>
       </div>
-      <form id="addFriendForm" class="modal-body friend-form">
-        <p class="muted">이메일로 친구를 찾아 모아 잇다에서 함께 이야기해요.</p>
-        <label for="friendEmail">친구 이메일</label>
-        <input id="friendEmail" type="email" placeholder="friend@example.com" autocomplete="email" required>
-        <span class="help-text">친구가 가입할 때 사용한 이메일을 입력해주세요.</span>
+      <div class="modal-body friend-form">
+        <p class="muted">닉네임으로 친구를 찾아보세요.</p>
+        <label for="friendSearchInput">닉네임 검색</label>
+        <div class="friend-search-box"><span aria-hidden="true">⌕</span><input id="friendSearchInput" type="search" maxlength="30" placeholder="닉네임을 입력하세요" autocomplete="off"></div>
+        <p id="friendSearchStatus" class="help-text" role="status" aria-live="polite">닉네임을 입력하면 검색 결과가 보여요.</p>
+        <div id="friendSearchResults" class="friend-search-results"></div>
         <div class="modal-foot">
           <button type="button" class="ghost-btn" data-close="addFriendModal">취소</button>
-          <button class="primary-btn" type="submit">친구 요청 보내기</button>
         </div>
-      </form>
+      </div>
     </div>
   </div>
 
