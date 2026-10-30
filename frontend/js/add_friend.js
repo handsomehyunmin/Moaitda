@@ -34,7 +34,9 @@ async function searchFriends(query) {
       info.className = "friend-info";
       const name = document.createElement("strong");
       name.textContent = person.nickname || "사용자";
-      info.append(name);
+      const email = document.createElement("span");
+      email.textContent = person.email || "";
+      info.append(name, email);
       const button = document.createElement("button");
       button.type = "button";
       button.className = person.relationship === "none" ? "primary-btn compact" : "ghost-btn compact";

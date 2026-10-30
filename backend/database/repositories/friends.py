@@ -99,7 +99,7 @@ def search_users(username, query):
         conn.row_factory = sqlite3.Row
         user_id = _user_id(conn, username)
         return [dict(row) for row in conn.execute("""
-            SELECT u.id, u.nickname,
+            SELECT u.id, u.nickname, u.username AS email,
                 CASE
                     WHEN f.user_id IS NOT NULL THEN 'friends'
                     WHEN outgoing.status = 'pending' THEN 'requested'
