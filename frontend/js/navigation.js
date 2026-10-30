@@ -1,10 +1,8 @@
 import { state } from "./state.js";
-import { initFriends } from "./friend.js";
 import {
   $,
   $$,
   closeModal,
-  openModal,
   showScreen
 } from "./ui.js";
 
@@ -20,10 +18,6 @@ export function initNavigation({ renderPosts } = {}) {
       showScreen(button.dataset.show);
     });
   });
-
-  $("#openAddFriendBtn")?.addEventListener("click", () => openModal("addFriendModal"));
-  $("#friendsAddBtn")?.addEventListener("click", () => openModal("addFriendModal"));
-  initFriends();
 
   $$("[data-close]").forEach((button) => {
     button.addEventListener("click", () => {

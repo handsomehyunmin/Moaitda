@@ -21,6 +21,7 @@ import {
 } from "./profile.js";
 import { initNavigation } from "./navigation.js";
 import { initAddFriend } from "./add_friend.js";
+import { initFriends } from "./friend.js";
 
 function enterHome() {
   showScreen("homeScreen");
@@ -47,6 +48,7 @@ function startApp() {
     renderPosts
   });
   initAddFriend();
+  initFriends();
 
   restoreSession();
 

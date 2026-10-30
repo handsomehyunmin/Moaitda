@@ -1,7 +1,14 @@
 import { apiRequest, loadFriends } from "./friend.js";
-import { closeModal, toast } from "./ui.js";
+import { closeModal, openModal, toast } from "./ui.js";
 
 export function initAddFriend() {
+  document.querySelector("#openAddFriendBtn")?.addEventListener("click", () => {
+    openModal("addFriendModal");
+  });
+  document.querySelector("#friendsAddBtn")?.addEventListener("click", () => {
+    openModal("addFriendModal");
+  });
+
   const form = document.querySelector("#addFriendForm");
   form?.addEventListener("submit", async (event) => {
     event.preventDefault();

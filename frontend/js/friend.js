@@ -71,8 +71,11 @@ export async function loadFriends() {
 
 export function initFriends() {
   document.querySelector("#friendListRefresh")?.addEventListener("click", loadFriends);
-  document.querySelector("#showFriendsBtn")?.addEventListener("click", () => {
+  document.addEventListener("click", (event) => {
+    if (!event.target.closest("#showFriendsBtn")) return;
     setFriendsView("friendsPanel");
+    $$(".side-link").forEach((link) => link.classList.remove("active"));
+    document.querySelector("#showFriendsBtn")?.classList.add("active");
     loadFriends();
-  });
+  }, true);
 }
