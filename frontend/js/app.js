@@ -32,6 +32,10 @@ function enterHome() {
 }
 
 function startApp() {
+  // Bind friend controls before the other UI modules initialize.
+  initAddFriend();
+  initFriends();
+
   initAuth({ enterHome });
   initPosts();
 
@@ -47,9 +51,6 @@ function startApp() {
   initNavigation({
     renderPosts
   });
-  initAddFriend();
-  initFriends();
-
   restoreSession();
 
   if (state.currentUser) {
