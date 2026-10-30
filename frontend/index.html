@@ -269,6 +269,17 @@
         document.querySelectorAll(".side-link").forEach((link) => link.classList.remove("active"));
         document.querySelector("#showFriendsBtn")?.classList.add("active");
         document.dispatchEvent(new Event("friends:open"));
+        return;
+      }
+
+      const postFilterButton = event.target.closest(".side-link[data-filter]");
+      if (postFilterButton) {
+        document.querySelector("#friendsPanel")?.classList.add("hidden");
+        ["#pageHeading", ".page-toolbar", "#postFeed"].forEach((selector) => {
+          document.querySelector(selector)?.classList.remove("hidden");
+        });
+        document.querySelectorAll(".side-link").forEach((link) => link.classList.remove("active"));
+        postFilterButton.classList.add("active");
       }
     });
   </script>
