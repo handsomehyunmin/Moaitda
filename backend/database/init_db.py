@@ -53,6 +53,27 @@ def initialize_database():
             )
         """)
 
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS friends (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                friend_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                created_at TEXT NOT NULL,
+                UNIQUE(user_id, friend_id),
+                CHECK(user_id < friend_id)
+            )
+        """)
+        conn.execute("""
+            CREATE INDEX IF NOT EXISTS friends_friend_id ON friends(friend_id)
+        """)
+        conn.execute("""
+            INSERT OR IGNORE INTO friends (user_id, friend_id, created_at)
+            SELECT MIN(sender_id, receiver_id), MAX(sender_id, receiver_id), MIN(created_at)
+            FROM friend_requests
+            WHERE status = 'accepted'
+            GROUP BY MIN(sender_id, receiver_id), MAX(sender_id, receiver_id)
+        """)
+
         fields = {
             "users": {
                 "profile_image":
