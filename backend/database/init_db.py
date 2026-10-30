@@ -40,6 +40,19 @@ def initialize_database():
             )
         """)
 
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS friend_requests (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                sender_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                receiver_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                status TEXT NOT NULL DEFAULT 'pending',
+                created_at TEXT NOT NULL,
+                UNIQUE(sender_id, receiver_id),
+                CHECK(sender_id != receiver_id),
+                CHECK(status IN ('pending', 'accepted', 'rejected'))
+            )
+        """)
+
         fields = {
             "users": {
                 "profile_image":

@@ -64,15 +64,77 @@ export async function loadFriends() {
       item.innerHTML = `<span class="friend-avatar">${escapeHtml(nickname.slice(0, 1).toUpperCase())}</span><div class="friend-info"><strong>${escapeHtml(nickname)}</strong><span>${escapeHtml(friend.email || "")}</span></div>`;
       list.append(item);
     });
+    await loadPendingRequests({ renderList: false });
   } catch (error) {
     if (status) status.textContent = error.message;
   }
 }
 
+export async function loadPendingRequests({ renderList = true } = {}) {
+  const status = document.querySelector("#pendingFriendsStatus");
+  const list = document.querySelector("#pendingFriendsList");
+  const count = document.querySelector("#pendingFriendCount");
+  try {
+    const requests = await apiRequest("/friends/requests");
+    const pending = Array.isArray(requests) ? requests : [];
+    if (count) {
+      count.textContent = String(pending.length);
+      count.classList.toggle("hidden", pending.length === 0);
+    }
+    if (!renderList || !list) return;
+    list.replaceChildren();
+    if (status) status.textContent = pending.length ? `${pending.length}개의 받은 요청` : "대기 중인 친구 요청이 없습니다.";
+    pending.forEach((request) => {
+      const card = document.createElement("article");
+      card.className = "friend-card";
+      const avatar = document.createElement("span");
+      avatar.className = "friend-avatar";
+      avatar.textContent = (request.nickname || request.email || "?").slice(0, 1).toUpperCase();
+      const info = document.createElement("div");
+      info.className = "friend-info";
+      const name = document.createElement("strong");
+      name.textContent = request.nickname || request.email || "사용자";
+      const email = document.createElement("span");
+      email.textContent = request.email || "";
+      info.append(name, email);
+      const actions = document.createElement("div");
+      actions.className = "request-actions";
+      ["수락", "거절"].forEach((label) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = label === "수락" ? "primary-btn compact" : "ghost-btn";
+        button.textContent = label;
+        button.dataset.requestAction = label === "수락" ? "accept" : "reject";
+        button.dataset.requestId = request.id;
+        actions.append(button);
+      });
+      card.append(avatar, info, actions);
+      list.append(card);
+    });
+  } catch (error) {
+    if (renderList && status) status.textContent = error.message;
+  }
+}
+
 export function initFriends() {
   document.querySelector("#friendListRefresh")?.addEventListener("click", loadFriends);
+  document.addEventListener("click", async (event) => {
+    const button = event.target.closest("[data-request-action]");
+    if (!button) return;
+    button.disabled = true;
+    try {
+      await apiRequest(`/friends/requests/${encodeURIComponent(button.dataset.requestId)}/${button.dataset.requestAction}`, { method: "POST" });
+      await loadPendingRequests();
+      await loadFriends();
+    } catch (error) {
+      button.disabled = false;
+      const status = document.querySelector("#pendingFriendsStatus");
+      if (status) status.textContent = error.message;
+    }
+  });
   document.addEventListener("friends:open", () => {
     setFriendsView("friendsPanel");
     loadFriends();
   });
+  document.addEventListener("friends:pending-open", () => loadPendingRequests());
 }

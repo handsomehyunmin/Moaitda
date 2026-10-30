@@ -19,7 +19,7 @@ from schemas import (
 )
 
 from database.init_db import initialize_database
-from database.repositories import users, posts, comments
+from database.repositories import users, posts, comments, friends
 
 
 sessions = {}
@@ -152,6 +152,48 @@ def list_posts(
 ):
     authenticated_user(authorization)
     return posts.list_uploaded_posts()
+
+
+@app.get("/friends")
+def list_friends(authorization: str = Header(default="")):
+    user = authenticated_user(authorization)
+    return friends.list_friends(user[0])
+
+
+@app.post("/friends", status_code=201)
+def send_friend_request(data: dict, authorization: str = Header(default="")):
+    user = authenticated_user(authorization)
+    email = str(data.get("email", "")).strip().lower()
+    if not email:
+        raise HTTPException(status_code=422, detail="친구 이메일을 입력해주세요.")
+    try:
+        return friends.send_request(user[0], email)
+    except ValueError as error:
+        raise HTTPException(status_code=400, detail=str(error))
+
+
+@app.get("/friends/requests")
+def list_friend_requests(authorization: str = Header(default="")):
+    user = authenticated_user(authorization)
+    return friends.list_incoming_requests(user[0])
+
+
+@app.post("/friends/requests/{request_id}/accept")
+def accept_friend_request(request_id: int, authorization: str = Header(default="")):
+    user = authenticated_user(authorization)
+    try:
+        return friends.respond_to_request(user[0], request_id, "accepted")
+    except ValueError as error:
+        raise HTTPException(status_code=404, detail=str(error))
+
+
+@app.post("/friends/requests/{request_id}/reject")
+def reject_friend_request(request_id: int, authorization: str = Header(default="")):
+    user = authenticated_user(authorization)
+    try:
+        return friends.respond_to_request(user[0], request_id, "rejected")
+    except ValueError as error:
+        raise HTTPException(status_code=404, detail=str(error))
 
 
 @app.post("/posts", status_code=201)

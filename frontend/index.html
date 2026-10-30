@@ -116,10 +116,16 @@
             </div>
             <div class="friends-actions">
               <button class="ghost-btn" id="friendListRefresh" type="button">새로고침</button>
+              <button class="ghost-btn" id="pendingFriendsBtn" type="button">친구 추가 대기중 <span id="pendingFriendCount" class="pending-count hidden">0</span></button>
               <button class="primary-btn compact" id="friendsAddBtn" type="button">＋ 친구 추가</button>
             </div>
           </div>
           <div id="friendList" class="friend-list"></div>
+          <section id="pendingFriendsPanel" class="pending-friends hidden" aria-label="받은 친구 요청">
+            <h3>받은 친구 요청</h3>
+            <p id="pendingFriendsStatus" class="muted" role="status" aria-live="polite"></p>
+            <div id="pendingFriendsList" class="friend-list"></div>
+          </section>
         </section>
       </main>
     </div>
@@ -266,9 +272,18 @@
           document.querySelector(selector)?.classList.add("hidden");
         });
         document.querySelector("#friendsPanel")?.classList.remove("hidden");
+        document.querySelector("#friendList")?.classList.remove("hidden");
+        document.querySelector("#pendingFriendsPanel")?.classList.add("hidden");
         document.querySelectorAll(".side-link").forEach((link) => link.classList.remove("active"));
         document.querySelector("#showFriendsBtn")?.classList.add("active");
         document.dispatchEvent(new Event("friends:open"));
+        return;
+      }
+
+      if (event.target.closest("#pendingFriendsBtn")) {
+        document.querySelector("#friendList")?.classList.add("hidden");
+        document.querySelector("#pendingFriendsPanel")?.classList.remove("hidden");
+        document.dispatchEvent(new Event("friends:pending-open"));
         return;
       }
 
