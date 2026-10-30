@@ -153,6 +153,13 @@
         <label>태그</label>
         <input id="postTags" type="text" placeholder="예: 아이디어, 게임">
 
+        <label for="postVisibility">공개 범위</label>
+        <select id="postVisibility">
+          <option value="public">전체 공개</option>
+          <option value="friends">친구만</option>
+        </select>
+        <span class="help-text">친구만 공개한 게시물은 친구가 아닌 사용자에게 보이지 않아요.</span>
+
         <label>이미지</label>
         <input id="postImage" type="file" accept="image/jpeg,image/png,image/gif,image/webp">
         <span class="help-text">최대 20MB / 비율을 유지하여 자동 축소합니다. GIF는 정지 사진으로 저장됩니다.</span>

@@ -150,8 +150,8 @@ def validate_image(image):
 def list_posts(
     authorization: str = Header(default="")
 ):
-    authenticated_user(authorization)
-    return posts.list_uploaded_posts()
+    user = authenticated_user(authorization)
+    return posts.list_uploaded_posts(user[0])
 
 
 @app.get("/friends")
@@ -224,7 +224,8 @@ def upload_post(
             timezone.utc
         ).isoformat(),
         "likes": [],
-        "comments": []
+        "comments": [],
+        "visibility": data.visibility
     }
 
     posts.save_uploaded_post(post)
@@ -299,6 +300,9 @@ def add_comment(
     authorization: str = Header(default="")
 ):
     user = authenticated_user(authorization)
+
+    if not posts.can_view_post(post_id, user[0]):
+        raise HTTPException(status_code=404, detail="게시물을 찾을 수 없습니다.")
 
     post = comments.add_post_comment(
         post_id,

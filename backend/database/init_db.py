@@ -81,6 +81,7 @@ def initialize_database():
             },
             "posts": {
                 "public_id": "TEXT",
+                "visibility": "TEXT NOT NULL DEFAULT 'public'",
                 "tags": "TEXT NOT NULL DEFAULT '[]'",
                 "image": "TEXT NOT NULL DEFAULT ''",
                 "created_at": "TEXT",

@@ -98,7 +98,8 @@ def _serialize_post(conn, post_id):
                     p.created_at,
                     p.updated_at,
                     p.likes,
-                    u.profile_image
+                    u.profile_image,
+                    p.visibility
                 FROM posts p
                 JOIN users u
                     ON u.id = p.user_id
@@ -125,22 +126,28 @@ def _serialize_post(conn, post_id):
         comments.append({'authorImage': comment[5] or '', 'id': str(comment[0]), 'authorEmail': comment[1], 'authorName': comment[2], 'text': comment[3], 'createdAt': comment[4] or now()})
     tags = _json_list(row[4])
     likes = _json_list(row[10])
-    post = {'authorImage': row[11] or '', 'id': row[1] or str(row[0]), 'title': row[2] or '', 'content': row[3] or '', 'tags': tags, 'image': row[5] or '', 'authorEmail': row[6], 'authorName': row[7], 'createdAt': row[8] or now(), 'likes': likes, 'comments': comments}
+    post = {'authorImage': row[11] or '', 'id': row[1] or str(row[0]), 'title': row[2] or '', 'content': row[3] or '', 'tags': tags, 'image': row[5] or '', 'authorEmail': row[6], 'authorName': row[7], 'createdAt': row[8] or now(), 'likes': likes, 'comments': comments, 'visibility': row[12] or 'public'}
     if row[9]:
         post['updatedAt'] = row[9]
     return post
 
 
-def list_uploaded_posts():
+def list_uploaded_posts(viewer_username):
     with closing(get_connection()) as conn:
+        viewer_id = _user_id(conn, viewer_username)
         posts = []
         rows = conn.execute("""
-            SELECT id
-                        FROM posts
-                        ORDER BY
-                            created_at DESC,
-                            id DESC
-        """).fetchall()
+            SELECT p.id
+            FROM posts p
+            WHERE p.visibility = 'public'
+                OR p.user_id = ?
+                OR EXISTS (
+                    SELECT 1 FROM friends f
+                    WHERE f.user_id = min(p.user_id, ?)
+                        AND f.friend_id = max(p.user_id, ?)
+                )
+            ORDER BY p.created_at DESC, p.id DESC
+        """, (viewer_id, viewer_id, viewer_id)).fetchall()
         for row in rows:
             post = _serialize_post(conn, row[0])
             if post is not None:
@@ -156,9 +163,31 @@ def find_uploaded_post(post_id):
         return _serialize_post(conn, row[0])
 
 
+def _can_view_post(conn, post_id, viewer_username):
+    row = conn.execute("""
+        SELECT p.visibility, p.user_id
+        FROM posts p
+        WHERE p.public_id = ? OR (p.public_id IS NULL AND CAST(p.id AS TEXT) = ?)
+    """, (str(post_id), str(post_id))).fetchone()
+    if not row:
+        return False
+    viewer_id = _user_id(conn, viewer_username)
+    if row[1] == viewer_id or row[0] != "friends":
+        return True
+    return conn.execute("""
+        SELECT 1 FROM friends
+        WHERE user_id = min(?, ?) AND friend_id = max(?, ?)
+    """, (row[1], viewer_id, row[1], viewer_id)).fetchone() is not None
+
+
+def can_view_post(post_id, viewer_username):
+    with closing(get_connection()) as conn:
+        return _can_view_post(conn, post_id, viewer_username)
+
+
 def _save_post(conn, post):
     row = _post_row(conn, post['id'])
-    values = (post['title'], post['content'], json.dumps(post.get('tags', []), ensure_ascii=False), post.get('image', ''))
+    values = (post['title'], post['content'], json.dumps(post.get('tags', []), ensure_ascii=False), post.get('image', ''), post.get('visibility', 'public'))
     if row:
         conn.execute("""
             UPDATE posts
@@ -167,6 +196,7 @@ def _save_post(conn, post):
                             content = ?,
                             tags = ?,
                             image = ?,
+                            visibility = ?,
                             updated_at = ?
                         WHERE id = ?
         """, (*values, post.get('updatedAt') or now(), row[0]))
@@ -177,12 +207,13 @@ def _save_post(conn, post):
                             content,
                             tags,
                             image,
+                            visibility,
                             public_id,
                             user_id,
                             created_at,
                             updated_at
                         )
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (*values, post['id'], _user_id(conn, post['authorEmail']), post.get('createdAt') or now(), post.get('updatedAt')))
 
 
@@ -213,6 +244,8 @@ def toggle_post_like(post_id, username):
         try:
             row = _post_row(conn, post_id)
             if not row:
+                return None
+            if not _can_view_post(conn, post_id, username):
                 return None
             _user_id(conn, username)
             conn.execute('BEGIN IMMEDIATE')

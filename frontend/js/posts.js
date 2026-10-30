@@ -120,6 +120,7 @@ export function renderPosts() {
             <span>${formatDate(post.createdAt)}</span>
           </div>
         </div>
+        ${post.visibility === "friends" ? '<span class="visibility-badge">친구 공개</span>' : ""}
       </div>
 
       <h3>${escapeHtml(post.title)}</h3>
@@ -208,6 +209,7 @@ export function openWrite(post = null) {
   $("#postTitle").value = post?.title || "";
   $("#postContent").value = post?.content || "";
   $("#postTags").value = (post?.tags || []).join(", ");
+  $("#postVisibility").value = post?.visibility || "public";
 
   state.imageData = post?.image || "";
 
@@ -359,7 +361,8 @@ async function handlePostSubmit(event) {
           title,
           content,
           tags,
-          image: state.imageData
+          image: state.imageData,
+          visibility: $("#postVisibility").value
         })
       }
     );

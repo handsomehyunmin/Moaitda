@@ -23,6 +23,7 @@ class CommentRequest(BaseModel):
     content: str
 
 
+from typing import Literal
 from pydantic import Field, field_validator
 
 class UploadPostRequest(BaseModel):
@@ -30,6 +31,7 @@ class UploadPostRequest(BaseModel):
     content: str = Field(min_length=1, max_length=1000)
     tags: list[str] = Field(default_factory=list, max_length=6)
     image: str = Field(default="", max_length=2800000)
+    visibility: Literal["public", "friends"] = "public"
 
     @field_validator("title", "content")
     @classmethod
