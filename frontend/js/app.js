@@ -20,6 +20,7 @@ import {
   updateProfileUI
 } from "./profile.js";
 import { initNavigation } from "./navigation.js";
+import { initAddFriend } from "./add_friend.js";
 
 function enterHome() {
   showScreen("homeScreen");
@@ -45,6 +46,7 @@ function startApp() {
   initNavigation({
     renderPosts
   });
+  initAddFriend();
 
   restoreSession();
 

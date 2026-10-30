@@ -1,5 +1,5 @@
 import { apiRequest, loadFriends } from "./friend.js";
-import { toast } from "./ui.js";
+import { closeModal, toast } from "./ui.js";
 
 export function initAddFriend() {
   const form = document.querySelector("#addFriendForm");
@@ -17,6 +17,7 @@ export function initAddFriend() {
         body: JSON.stringify({ email: identifier })
       });
       input.value = "";
+      closeModal("addFriendModal");
       toast("친구 요청을 보냈습니다.");
       document.querySelector("#showFriendsBtn")?.click();
       await loadFriends();

@@ -78,11 +78,13 @@
           <button class="side-link active" data-filter="all">⌂ <span>홈</span></button>
           <button class="side-link" data-filter="mine">▤ <span>내 게시물</span></button>
           <button class="side-link" data-filter="liked">♡ <span>좋아요</span></button>
+          <button class="side-link" id="showFriendsBtn">♧ <span>친구 목록</span></button>
+          <button class="side-link" id="openAddFriendBtn">＋ <span>친구 추가</span></button>
         </div>
       </aside>
 
       <main class="main-area">
-        <div class="page-heading">
+        <div class="page-heading" id="pageHeading">
           <div>
             <p class="eyebrow">COMMUNITY</p>
             <h2 id="pageTitle">홈</h2>
@@ -104,6 +106,21 @@
           <strong>게시물이 없습니다.</strong>
           <span>첫 게시물을 작성해보세요.</span>
         </div>
+
+        <section id="friendsPanel" class="friends-panel hidden" aria-labelledby="friendsTitle">
+          <div class="friends-heading">
+            <div>
+              <p class="eyebrow">YOUR PEOPLE</p>
+              <h2 id="friendsTitle">친구 목록</h2>
+              <p id="friendListStatus" class="muted" role="status" aria-live="polite">친구 목록을 불러오는 중...</p>
+            </div>
+            <div class="friends-actions">
+              <button class="ghost-btn" id="friendListRefresh" type="button">새로고침</button>
+              <button class="primary-btn compact" id="friendsAddBtn" type="button">＋ 친구 추가</button>
+            </div>
+          </div>
+          <div id="friendList" class="friend-list"></div>
+        </section>
       </main>
     </div>
   </section>
@@ -178,6 +195,27 @@
           </form>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- 친구 추가 모달 -->
+  <div class="modal hidden" id="addFriendModal" role="dialog" aria-modal="true" aria-labelledby="addFriendTitle">
+    <div class="modal-backdrop" data-close="addFriendModal"></div>
+    <div class="modal-card small-modal friend-modal">
+      <div class="modal-head">
+        <div><p class="eyebrow">STAY CONNECTED</p><h3 id="addFriendTitle">친구 추가</h3></div>
+        <button class="close-btn" type="button" data-close="addFriendModal" aria-label="닫기">×</button>
+      </div>
+      <form id="addFriendForm" class="modal-body friend-form">
+        <p class="muted">이메일로 친구를 찾아 모아 잇다에서 함께 이야기해요.</p>
+        <label for="friendEmail">친구 이메일</label>
+        <input id="friendEmail" type="email" placeholder="friend@example.com" autocomplete="email" required>
+        <span class="help-text">친구가 가입할 때 사용한 이메일을 입력해주세요.</span>
+        <div class="modal-foot">
+          <button type="button" class="ghost-btn" data-close="addFriendModal">취소</button>
+          <button class="primary-btn" type="submit">친구 요청 보내기</button>
+        </div>
+      </form>
     </div>
   </div>
 

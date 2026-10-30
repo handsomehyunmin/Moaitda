@@ -4,11 +4,11 @@ import { clearSession } from "./session.js";
 import { $$, showScreen } from "./ui.js";
 
 function setFriendsView(panelId) {
+  const showingFriends = panelId === "friendsPanel";
   ["#pageHeading", ".page-toolbar", "#postFeed", "#emptyState"].forEach((selector) => {
-    document.querySelector(selector)?.classList.add("hidden");
+    document.querySelector(selector)?.classList.toggle("hidden", showingFriends);
   });
-  document.querySelector("#friendsPanel")?.classList.toggle("hidden", panelId !== "friendsPanel");
-  document.querySelector("#addFriendPanel")?.classList.toggle("hidden", panelId !== "addFriendPanel");
+  document.querySelector("#friendsPanel")?.classList.toggle("hidden", !showingFriends);
 }
 
 export async function apiRequest(path, options = {}) {
@@ -74,8 +74,5 @@ export function initFriends() {
   document.querySelector("#showFriendsBtn")?.addEventListener("click", () => {
     setFriendsView("friendsPanel");
     loadFriends();
-  });
-  document.querySelector("#showAddFriendBtn")?.addEventListener("click", () => {
-    setFriendsView("addFriendPanel");
   });
 }

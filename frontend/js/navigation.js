@@ -1,8 +1,10 @@
 import { state } from "./state.js";
+import { initFriends } from "./friend.js";
 import {
   $,
   $$,
   closeModal,
+  openModal,
   showScreen
 } from "./ui.js";
 
@@ -18,6 +20,10 @@ export function initNavigation({ renderPosts } = {}) {
       showScreen(button.dataset.show);
     });
   });
+
+  $("#openAddFriendBtn")?.addEventListener("click", () => openModal("addFriendModal"));
+  $("#friendsAddBtn")?.addEventListener("click", () => openModal("addFriendModal"));
+  initFriends();
 
   $$("[data-close]").forEach((button) => {
     button.addEventListener("click", () => {
@@ -54,6 +60,10 @@ export function initNavigation({ renderPosts } = {}) {
   $$(".side-link[data-filter]").forEach(
     (button) => {
       button.addEventListener("click", () => {
+        document.querySelector("#friendsPanel")?.classList.add("hidden");
+        ["#pageHeading", ".page-toolbar", "#postFeed", "#emptyState"].forEach((selector) => {
+          document.querySelector(selector)?.classList.remove("hidden");
+        });
         state.currentFilter = {
           type: button.dataset.filter,
           value: null
@@ -82,7 +92,8 @@ export function initNavigation({ renderPosts } = {}) {
     [
       "writeModal",
       "detailModal",
-      "profileModal"
+      "profileModal",
+      "addFriendModal"
     ].forEach((id) => {
       closeModal(id);
     });
