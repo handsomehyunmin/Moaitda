@@ -131,6 +131,10 @@ button { cursor: pointer; }
 .sidebar {
   flex-shrink: 0;
   width: 14.375rem;
+  position: sticky;
+  top: 4.5rem;
+  align-self: flex-start;
+  height: calc(100vh - 4.5rem);
   padding: 1.375rem 1rem;
   background: #fff;
   border-right: 0.0625rem solid var(--line);
@@ -152,7 +156,7 @@ button { cursor: pointer; }
 }
 .side-link:hover, .side-link.active { background: var(--primary-soft); color: var(--primary); }
 
-.main-area { flex: 1; min-width: 0; padding: 2.125rem; overflow: auto; }
+.main-area { flex: 1; min-width: 0; padding: 2.125rem; overflow: visible; }
 .welcome-card { position: relative; display: flex; justify-content: space-between; align-items: center; gap: 1.5rem; max-width: 56.25rem; min-height: 10.25rem; margin: 0 auto 1.75rem; padding: 1.5rem 1.75rem; overflow: hidden; border: 1px solid #e4e6ff; border-radius: 1.25rem; background: linear-gradient(115deg, #fff 0%, #f4f3ff 62%, #ecebff 100%); box-shadow: 0 .5rem 1.5rem rgba(74, 82, 165, .07); }
 .welcome-copy { position: relative; z-index: 1; }
 .welcome-card .eyebrow { margin-bottom: .5rem; }
