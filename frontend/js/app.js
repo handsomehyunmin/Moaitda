@@ -31,6 +31,10 @@ const dailyWords = [
 ];
 
 function updateWelcomeCard() {
+  const welcomeCard = document.querySelector("#homeWelcome");
+  if (!welcomeCard) return;
+
+  welcomeCard.classList.remove("hidden");
   const nickname = state.currentUser?.nickname || "사용자";
   const date = new Date();
   document.querySelector("#welcomeName").textContent = nickname;
