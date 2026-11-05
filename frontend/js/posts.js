@@ -367,6 +367,22 @@ async function handlePostSubmit(event) {
       }
     );
 
+    if (
+      $("#postVisibility").value === "friends" &&
+      post.visibility !== "friends"
+    ) {
+      if (!editingId && post.id) {
+        try {
+          await apiRequest(`/posts/${encodeURIComponent(post.id)}`, {
+            method: "DELETE"
+          });
+        } catch (cleanupError) {
+          console.error("Could not remove a post saved with the wrong visibility.", cleanupError);
+        }
+      }
+      throw new Error("서버가 친구 공개 설정을 저장하지 않았어요. 백엔드 서버를 최신 코드로 재시작한 뒤 다시 저장해주세요.");
+    }
+
     if (editingId) {
       const index = state.posts.findIndex(
         (item) => item.id === editingId
