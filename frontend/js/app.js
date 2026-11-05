@@ -23,8 +23,23 @@ import { initNavigation } from "./navigation.js";
 import { initAddFriend } from "./add_friend.js";
 import { initFriends } from "./friend.js";
 
+const dailyWords = [
+  "좋은 생각은 나누는 순간 더 커져요.",
+  "작은 기록이 좋은 대화의 시작이에요.",
+  "오늘 나눈 이야기가 새로운 연결이 돼요.",
+  "서로의 이야기에 귀 기울이는 하루가 되길 바라요."
+];
+
+function updateWelcomeCard() {
+  const nickname = state.currentUser?.nickname || "사용자";
+  const date = new Date();
+  document.querySelector("#welcomeName").textContent = nickname;
+  document.querySelector("#todayQuote").textContent = dailyWords[date.getDate() % dailyWords.length];
+}
+
 function enterHome() {
   showScreen("homeScreen");
+  updateWelcomeCard();
   updateProfileUI();
   renderPosts();
   loadPosts();

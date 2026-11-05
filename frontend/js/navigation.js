@@ -55,7 +55,7 @@ export function initNavigation({ renderPosts } = {}) {
     (button) => {
       button.addEventListener("click", () => {
         document.querySelector("#friendsPanel")?.classList.add("hidden");
-        ["#pageHeading", ".page-toolbar", "#postFeed", "#emptyState"].forEach((selector) => {
+        ["#homeWelcome", "#pageHeading", ".page-toolbar", "#postFeed", "#emptyState"].forEach((selector) => {
           document.querySelector(selector)?.classList.remove("hidden");
         });
         state.currentFilter = {

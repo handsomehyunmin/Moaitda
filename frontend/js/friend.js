@@ -5,7 +5,7 @@ import { $$, showScreen } from "./ui.js";
 
 function setFriendsView(panelId) {
   const showingFriends = panelId === "friendsPanel";
-  ["#pageHeading", ".page-toolbar", "#postFeed", "#emptyState"].forEach((selector) => {
+  ["#homeWelcome", "#pageHeading", ".page-toolbar", "#postFeed", "#emptyState"].forEach((selector) => {
     document.querySelector(selector)?.classList.toggle("hidden", showingFriends);
   });
   document.querySelector("#friendsPanel")?.classList.toggle("hidden", !showingFriends);

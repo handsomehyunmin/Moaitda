@@ -84,6 +84,17 @@
       </aside>
 
       <main class="main-area">
+        <section class="welcome-card" id="homeWelcome" aria-label="오늘의 환영 메시지">
+          <div class="welcome-copy">
+            <p class="eyebrow">A LITTLE HELLO</p>
+            <h2><span id="welcomeName">사용자</span>님, 오늘도 반가워요</h2>
+            <div class="welcome-quote">
+              <span>오늘의 한마디</span>
+              <p id="todayQuote">좋은 생각은 나누는 순간 더 커져요.</p>
+            </div>
+          </div>
+          <div class="welcome-orbit" aria-hidden="true"><span>✦</span></div>
+        </section>
         <div class="page-heading" id="pageHeading">
           <div>
             <p class="eyebrow">COMMUNITY</p>
@@ -275,7 +286,7 @@
       }
 
       if (event.target.closest("#showFriendsBtn")) {
-        ["#pageHeading", ".page-toolbar", "#postFeed", "#emptyState"].forEach((selector) => {
+        ["#homeWelcome", "#pageHeading", ".page-toolbar", "#postFeed", "#emptyState"].forEach((selector) => {
           document.querySelector(selector)?.classList.add("hidden");
         });
         document.querySelector("#friendsPanel")?.classList.remove("hidden");
@@ -297,7 +308,7 @@
       const postFilterButton = event.target.closest(".side-link[data-filter]");
       if (postFilterButton) {
         document.querySelector("#friendsPanel")?.classList.add("hidden");
-        ["#pageHeading", ".page-toolbar", "#postFeed"].forEach((selector) => {
+        ["#homeWelcome", "#pageHeading", ".page-toolbar", "#postFeed"].forEach((selector) => {
           document.querySelector(selector)?.classList.remove("hidden");
         });
         document.querySelectorAll(".side-link").forEach((link) => link.classList.remove("active"));

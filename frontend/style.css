@@ -153,6 +153,17 @@ button { cursor: pointer; }
 .side-link:hover, .side-link.active { background: var(--primary-soft); color: var(--primary); }
 
 .main-area { flex: 1; min-width: 0; padding: 2.125rem; overflow: auto; }
+.welcome-card { position: relative; display: flex; justify-content: space-between; align-items: center; gap: 1.5rem; max-width: 56.25rem; min-height: 10.25rem; margin: 0 auto 1.75rem; padding: 1.5rem 1.75rem; overflow: hidden; border: 1px solid #e4e6ff; border-radius: 1.25rem; background: linear-gradient(115deg, #fff 0%, #f4f3ff 62%, #ecebff 100%); box-shadow: 0 .5rem 1.5rem rgba(74, 82, 165, .07); }
+.welcome-copy { position: relative; z-index: 1; }
+.welcome-card .eyebrow { margin-bottom: .5rem; }
+.welcome-card h2 { margin: 0; font-size: 1.5rem; letter-spacing: -.035em; }
+.welcome-quote { display: flex; align-items: baseline; flex-wrap: wrap; gap: .5rem; margin-top: .875rem; }
+.welcome-quote span { color: var(--primary); font-size: .75rem; font-weight: 800; }
+.welcome-quote p { margin: 0; color: var(--muted); font-size: .875rem; }
+.welcome-orbit { position: absolute; right: 2.5rem; top: 50%; display: grid; width: 6rem; height: 6rem; place-items: center; transform: translateY(-50%); border: 1px solid rgba(91, 103, 241, .16); border-radius: 50%; color: rgba(91, 103, 241, .75); font-size: 2.5rem; }
+.welcome-orbit::before, .welcome-orbit::after { position: absolute; content: ""; border: 1px solid rgba(91, 103, 241, .12); border-radius: 50%; }
+.welcome-orbit::before { inset: .6rem; }
+.welcome-orbit::after { inset: -.6rem; }
 .page-heading { display: flex; justify-content: space-between; gap: 1.25rem; align-items: end; max-width: 56.25rem; margin: 0 auto; }
 .eyebrow { font-size: 0.6875rem; letter-spacing: .12em; color: var(--primary); font-weight: 800; margin: 0 0 0.4375rem; }
 .page-heading h2 { margin: 0; font-size: 1.75rem; }
@@ -314,6 +325,9 @@ button { cursor: pointer; }
   .search-wrap { display: none; }
   .feed-post { padding: 1.125rem; }
   .friends-heading { align-items: flex-start; flex-direction: column; }
+  .welcome-card { min-height: 9rem; padding: 1.25rem; }
+  .welcome-card h2 { max-width: 15rem; font-size: 1.25rem; }
+  .welcome-orbit { right: -1rem; width: 5.25rem; height: 5.25rem; opacity: .7; }
 }
 
 /* Match the larger desktop reference while keeping compact screens unchanged. */
