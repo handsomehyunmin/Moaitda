@@ -138,6 +138,25 @@
             <div id="pendingFriendsList" class="friend-list"></div>
           </section>
         </section>
+
+        <section id="friendChatPanel" class="friend-chat hidden" aria-labelledby="chatFriendName">
+          <div class="chat-heading">
+            <button id="chatBackBtn" class="ghost-btn" type="button">← 친구 목록</button>
+            <div class="chat-friend">
+              <span id="chatFriendAvatar" class="friend-avatar">?</span>
+              <div class="friend-info">
+                <strong id="chatFriendName">친구</strong>
+                <span id="chatConnectionStatus" role="status" aria-live="polite">연결 중...</span>
+              </div>
+            </div>
+          </div>
+          <div id="chatMessages" class="chat-messages" role="log" aria-live="polite" aria-relevant="additions"></div>
+          <p id="chatEmptyState" class="chat-empty">친구에게 첫 메시지를 보내보세요.</p>
+          <form id="chatForm" class="chat-form">
+            <input id="chatInput" type="text" maxlength="1000" placeholder="메시지를 입력하세요..." autocomplete="off" required>
+            <button id="chatSendBtn" class="primary-btn" type="submit" disabled>보내기</button>
+          </form>
+        </section>
       </main>
     </div>
   </section>
@@ -290,6 +309,7 @@
           document.querySelector(selector)?.classList.add("hidden");
         });
         document.querySelector("#friendsPanel")?.classList.remove("hidden");
+        document.querySelector("#friendChatPanel")?.classList.add("hidden");
         document.querySelector("#friendList")?.classList.remove("hidden");
         document.querySelector("#pendingFriendsPanel")?.classList.add("hidden");
         document.querySelectorAll(".side-link").forEach((link) => link.classList.remove("active"));
@@ -308,6 +328,7 @@
       const postFilterButton = event.target.closest(".side-link[data-filter]");
       if (postFilterButton) {
         document.querySelector("#friendsPanel")?.classList.add("hidden");
+        document.querySelector("#friendChatPanel")?.classList.add("hidden");
         ["#homeWelcome", "#pageHeading", ".page-toolbar", "#postFeed"].forEach((selector) => {
           document.querySelector(selector)?.classList.remove("hidden");
         });

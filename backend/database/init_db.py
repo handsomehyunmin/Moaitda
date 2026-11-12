@@ -67,6 +67,19 @@ def initialize_database():
             CREATE INDEX IF NOT EXISTS friends_friend_id ON friends(friend_id)
         """)
         conn.execute("""
+            CREATE TABLE IF NOT EXISTS chat_messages (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                sender_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                receiver_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                content TEXT NOT NULL,
+                created_at TEXT NOT NULL
+            )
+        """)
+        conn.execute("""
+            CREATE INDEX IF NOT EXISTS chat_messages_conversation
+            ON chat_messages(sender_id, receiver_id, id)
+        """)
+        conn.execute("""
             INSERT OR IGNORE INTO friends (user_id, friend_id, created_at)
             SELECT MIN(sender_id, receiver_id), MAX(sender_id, receiver_id), MIN(created_at)
             FROM friend_requests

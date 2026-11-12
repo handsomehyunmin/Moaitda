@@ -22,6 +22,7 @@ import {
 import { initNavigation } from "./navigation.js";
 import { initAddFriend } from "./add_friend.js";
 import { initFriends } from "./friend.js";
+import { initFriendChat } from "./friend_chat.js";
 
 const dailyWords = [
   "좋은 생각은 나누는 순간 더 커져요.",
@@ -54,6 +55,7 @@ function startApp() {
   // Bind friend controls before the other UI modules initialize.
   initAddFriend();
   initFriends();
+  initFriendChat();
 
   initAuth({ enterHome });
   initPosts();

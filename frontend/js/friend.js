@@ -63,6 +63,14 @@ export async function loadFriends() {
       item.className = "friend-card";
       const nickname = friend.nickname || friend.username || friend.email || "사용자";
       item.innerHTML = `<span class="friend-avatar">${escapeHtml(nickname.slice(0, 1).toUpperCase())}</span><div class="friend-info"><strong>${escapeHtml(nickname)}</strong><span>${escapeHtml(friend.email || "")}</span></div>`;
+      const chatButton = document.createElement("button");
+      chatButton.type = "button";
+      chatButton.className = "primary-btn compact friend-chat-open";
+      chatButton.textContent = "메시지";
+      chatButton.dataset.chatEmail = friend.email || "";
+      chatButton.dataset.chatNickname = nickname;
+      chatButton.disabled = !friend.email;
+      item.append(chatButton);
       list.append(item);
     });
     await loadPendingRequests({ renderList: false });
