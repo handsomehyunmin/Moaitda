@@ -8,3 +8,5 @@ __pycache__/
 board.db
 board.db-*
 board.backup-*
+server.stdout.log
+server.stderr.log

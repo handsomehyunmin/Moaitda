@@ -78,7 +78,8 @@
           <button class="side-link active" data-filter="all">⌂ <span>홈</span></button>
           <button class="side-link" data-filter="mine">▤ <span>내 게시물</span></button>
           <button class="side-link" data-filter="liked">♡ <span>좋아요</span></button>
-          <button class="side-link" id="showFriendsBtn" type="button">♧ <span>친구 목록</span><span id="chatUnreadTotal" class="chat-unread hidden" aria-live="polite"></span></button>
+          <button class="side-link" id="showFriendsBtn" type="button">♧ <span>친구 목록</span></button>
+          <button class="side-link" id="showChatsBtn" type="button">✉ <span>실시간 대화</span><span id="chatUnreadTotal" class="chat-unread hidden" aria-live="polite"></span></button>
           <button class="side-link" id="openAddFriendBtn" type="button">＋ <span>친구 추가</span></button>
         </div>
       </aside>
@@ -123,6 +124,7 @@
             <div>
               <p class="eyebrow">YOUR PEOPLE</p>
               <h2 id="friendsTitle">친구 목록</h2>
+              <p class="muted">친구 옆의 ‘대화하기’를 누르면 실시간 채팅창이 열립니다. 친구가 없다면 먼저 친구를 추가하고 요청을 수락해주세요.</p>
               <p id="friendListStatus" class="muted" role="status" aria-live="polite">친구 목록을 불러오는 중...</p>
             </div>
             <div class="friends-actions">
@@ -308,7 +310,8 @@
         return;
       }
 
-      if (event.target.closest("#showFriendsBtn")) {
+      const friendsNavigation = event.target.closest("#showFriendsBtn, #showChatsBtn");
+      if (friendsNavigation) {
         ["#homeWelcome", "#pageHeading", ".page-toolbar", "#postFeed", "#emptyState"].forEach((selector) => {
           document.querySelector(selector)?.classList.add("hidden");
         });
@@ -317,7 +320,8 @@
         document.querySelector("#friendList")?.classList.remove("hidden");
         document.querySelector("#pendingFriendsPanel")?.classList.add("hidden");
         document.querySelectorAll(".side-link").forEach((link) => link.classList.remove("active"));
-        document.querySelector("#showFriendsBtn")?.classList.add("active");
+        friendsNavigation.classList.add("active");
+        document.querySelector("#friendsTitle").textContent = friendsNavigation.id === "showChatsBtn" ? "실시간 대화" : "친구 목록";
         document.dispatchEvent(new Event("friends:open"));
         return;
       }

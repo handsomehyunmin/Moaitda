@@ -66,7 +66,7 @@ export async function loadFriends() {
       const chatButton = document.createElement("button");
       chatButton.type = "button";
       chatButton.className = "primary-btn compact friend-chat-open";
-      chatButton.textContent = "메시지";
+      chatButton.textContent = "대화하기";
       chatButton.dataset.chatEmail = friend.email || "";
       chatButton.dataset.chatNickname = nickname;
       chatButton.disabled = !friend.email;

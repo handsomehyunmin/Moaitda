@@ -58,7 +58,10 @@ def run():
                         expect(page.locator("#homeScreen")).to_be_visible()
                         pages[name] = page
                     alice, bob = pages["alice"], pages["bob"]
-                    alice.locator("#showFriendsBtn").click()
+                    expect(alice.locator("#showChatsBtn")).to_be_visible()
+                    alice.locator("#showChatsBtn").click()
+                    expect(alice.locator("#friendsTitle")).to_have_text("실시간 대화")
+                    expect(alice.locator("[data-chat-email='bob@example.com']")).to_have_text("대화하기")
                     alice.locator("[data-chat-email='bob@example.com']").click()
                     expect(alice.locator("#chatSendBtn")).to_be_enabled()
                     alice.locator("#chatInput").fill("browser hello")
