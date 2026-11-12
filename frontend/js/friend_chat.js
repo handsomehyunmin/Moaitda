@@ -1,6 +1,6 @@
 import { API_BASE } from "./config.js";
 import { state } from "./state.js";
-import { apiRequest } from "./friend.js";
+import { apiRequest } from "./friend.js?v=friend-chat-20261112";
 
 let activeFriend = null;
 let socket = null;
