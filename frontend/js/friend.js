@@ -71,8 +71,13 @@ export async function loadFriends() {
       chatButton.dataset.chatNickname = nickname;
       chatButton.disabled = !friend.email;
       item.append(chatButton);
+      const unread = document.createElement("span");
+      unread.className = "chat-unread hidden";
+      unread.dataset.unreadEmail = friend.email || "";
+      item.append(unread);
       list.append(item);
     });
+    document.dispatchEvent(new Event("chat:friends-rendered"));
     await loadPendingRequests({ renderList: false });
   } catch (error) {
     if (status) status.textContent = error.message;

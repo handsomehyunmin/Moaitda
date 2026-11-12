@@ -26,6 +26,7 @@ export function clearSession() {
   state.sessionToken = "";
   state.posts = [];
   state.selectedPostId = null;
+  document.dispatchEvent(new Event("session:cleared"));
 
   try {
     sessionStorage.removeItem(SESSION_KEY);

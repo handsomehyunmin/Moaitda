@@ -78,7 +78,7 @@
           <button class="side-link active" data-filter="all">⌂ <span>홈</span></button>
           <button class="side-link" data-filter="mine">▤ <span>내 게시물</span></button>
           <button class="side-link" data-filter="liked">♡ <span>좋아요</span></button>
-          <button class="side-link" id="showFriendsBtn" type="button">♧ <span>친구 목록</span></button>
+          <button class="side-link" id="showFriendsBtn" type="button">♧ <span>친구 목록</span><span id="chatUnreadTotal" class="chat-unread hidden" aria-live="polite"></span></button>
           <button class="side-link" id="openAddFriendBtn" type="button">＋ <span>친구 추가</span></button>
         </div>
       </aside>
@@ -290,6 +290,10 @@
   </div>
 
   <div id="toast" class="toast hidden"></div>
+  <div id="chatNotification" class="chat-notification hidden" role="status" aria-live="polite">
+    <button id="chatNotificationOpen" type="button"></button>
+    <button id="chatNotificationDismiss" type="button" aria-label="메시지 알림 닫기">×</button>
+  </div>
   <script>
     document.addEventListener("click", (event) => {
       const addFriendButton = event.target.closest("#openAddFriendBtn, #friendsAddBtn");

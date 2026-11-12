@@ -88,6 +88,7 @@ def initialize_database():
         """)
 
         fields = {
+            "chat_messages": {"read_at": "TEXT"},
             "users": {
                 "profile_image":
                     "TEXT NOT NULL DEFAULT ''"

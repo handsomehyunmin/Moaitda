@@ -23,6 +23,7 @@ import { initNavigation } from "./navigation.js";
 import { initAddFriend } from "./add_friend.js";
 import { initFriends } from "./friend.js?v=friend-chat-20261112";
 import { initFriendChat } from "./friend_chat.js?v=friend-chat-20261112";
+import { initChatNotifications } from "./chat_notifications.js";
 
 const dailyWords = [
   "좋은 생각은 나누는 순간 더 커져요.",
@@ -49,6 +50,7 @@ function enterHome() {
   renderPosts();
   loadPosts();
   refreshProfile();
+  document.dispatchEvent(new Event("session:ready"));
 }
 
 function startApp() {
@@ -56,6 +58,7 @@ function startApp() {
   initAddFriend();
   initFriends();
   initFriendChat();
+  initChatNotifications();
 
   initAuth({ enterHome });
   initPosts();

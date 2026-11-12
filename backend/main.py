@@ -8,7 +8,7 @@ from datetime import datetime, timezone
 from secrets import token_urlsafe
 from uuid import uuid4
 
-from fastapi import FastAPI, Header, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, Header, HTTPException, Query, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 
 from schemas import (
@@ -25,6 +25,7 @@ from database.repositories import users, posts, comments, friends, chats
 
 sessions = {}
 chat_connections = {}
+notification_connections = {}
 chat_connections_lock = asyncio.Lock()
 
 
@@ -69,14 +70,20 @@ app.add_middleware(
 
 
 async def broadcast_chat_message(message):
+    await broadcast_chat_event({"type": "message", "message": message}, message["senderEmail"], message["receiverEmail"])
+
+
+async def broadcast_chat_event(event, first, second):
     room = tuple(sorted(
-        (message["senderEmail"].lower(), message["receiverEmail"].lower())
+        (first.lower(), second.lower())
     ))
     async with chat_connections_lock:
-        sockets = list(chat_connections.get(room, set()))
+        sockets = set(chat_connections.get(room, set()))
+        for username in room:
+            sockets.update(notification_connections.get(username, set()))
     for socket in sockets:
         try:
-            await socket.send_json({"type": "message", "message": message})
+            await socket.send_json(event)
         except Exception:
             pass
 
@@ -177,12 +184,54 @@ def list_friends(authorization: str = Header(default="")):
 
 
 @app.get("/friends/{friend_email}/messages")
-def list_chat_messages(friend_email: str, authorization: str = Header(default="")):
+def list_chat_messages(friend_email: str, authorization: str = Header(default=""), after_id: int | None = Query(default=None, ge=0)):
     user = authenticated_user(authorization)
     try:
-        return chats.list_messages(user[0], friend_email)
+        return chats.list_messages(user[0], friend_email, after_id=after_id)
     except ValueError as error:
         raise HTTPException(status_code=404, detail=str(error))
+
+
+@app.get("/chats/unread")
+def chat_unread(authorization: str = Header(default="")):
+    user = authenticated_user(authorization)
+    return chats.unread_counts(user[0])
+
+
+@app.post("/friends/{friend_email}/read")
+async def read_chat(friend_email: str, through_id: int = Query(ge=0), authorization: str = Header(default="")):
+    user = authenticated_user(authorization)
+    try:
+        event = chats.mark_read(user[0], friend_email, through_id)
+    except ValueError as error:
+        raise HTTPException(status_code=404, detail=str(error))
+    await broadcast_chat_event(event, user[0], friend_email)
+    return event
+
+
+@app.websocket("/ws/notifications")
+async def notification_socket(websocket: WebSocket, token: str = ""):
+    username = sessions.get(token)
+    if not username or not users.get_user(username):
+        await websocket.accept()
+        await websocket.close(code=4401)
+        return
+    await websocket.accept()
+    key = username.lower()
+    async with chat_connections_lock:
+        notification_connections.setdefault(key, set()).add(websocket)
+    try:
+        while True:
+            await websocket.receive_text()
+    except WebSocketDisconnect:
+        pass
+    finally:
+        async with chat_connections_lock:
+            sockets = notification_connections.get(key)
+            if sockets:
+                sockets.discard(websocket)
+                if not sockets:
+                    notification_connections.pop(key, None)
 
 
 @app.websocket("/ws/chat")
@@ -190,12 +239,14 @@ async def friend_chat_socket(websocket: WebSocket, token: str = "", with_user: s
     username = sessions.get(token)
     user = users.get_user(username) if username else None
     if not user:
+        await websocket.accept()
         await websocket.close(code=4401)
         return
 
     try:
         chats.list_messages(username, with_user, limit=1)
     except ValueError:
+        await websocket.accept()
         await websocket.close(code=4403)
         return
 
@@ -206,7 +257,11 @@ async def friend_chat_socket(websocket: WebSocket, token: str = "", with_user: s
 
     try:
         while True:
-            payload = await websocket.receive_json()
+            try:
+                payload = await websocket.receive_json()
+            except ValueError:
+                await websocket.send_json({"type": "error", "message": "올바른 메시지를 보내주세요."})
+                continue
             content = payload.get("content", "") if isinstance(payload, dict) else ""
             if not isinstance(content, str) or not content.strip() or len(content) > 1000:
                 await websocket.send_json({"type": "error", "message": "메시지는 1~1000자로 입력해주세요."})
@@ -216,6 +271,9 @@ async def friend_chat_socket(websocket: WebSocket, token: str = "", with_user: s
             except ValueError:
                 await websocket.send_json({"type": "error", "message": "친구와의 대화를 확인할 수 없습니다."})
                 continue
+            client_id = payload.get("clientMessageId")
+            if isinstance(client_id, str) and len(client_id) <= 100:
+                message["clientMessageId"] = client_id
             await broadcast_chat_message(message)
     except WebSocketDisconnect:
         pass
